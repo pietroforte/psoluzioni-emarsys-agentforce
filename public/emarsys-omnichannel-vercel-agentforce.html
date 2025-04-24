@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Unified CX Simulator - Emarsys + AgentForce</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      max-width: 960px;
+      margin: auto;
+      background: #f5f6fa;
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .logo-pair {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .logo-pair img {
+      height: 56px;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    section {
+      margin-top: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #ccc;
+    }
+    label, select, textarea, button {
+      display: block;
+      margin-top: 1rem;
+      width: 100%;
+    }
+    button {
+      background-color: #5A2D82;
+      color: white;
+      border: none;
+      padding: 0.6rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #47216a;
+    }
+    .badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+    .badge-positive { background-color: #d4edda; color: #155724; }
+    .badge-negative { background-color: #f8d7da; color: #721c24; }
+    .badge-neutral  { background-color: #fff3cd; color: #856404; }
+    #helperPanel {
+      background: #eef;
+      padding: 1rem;
+      margin-top: 2rem;
+      border-left: 4px solid #5A2D82;
+    }
+  </style>
+</head>
+<body>
+
+<h1>
+  <span class="logo-pair">
+    <img src="/emarsys-logo.png" alt="SAP Emarsys" />
+    <img src="/Salesforce-Agentforce.png" alt="Salesforce AgentForce" />
+  </span>
+  <span style="font-size: 1.5rem;">Unified CX Simulator</span>
+</h1>
+
+<p>This demo showcases a unified customer experience powered by <strong>SAP Emarsys</strong> and <strong>Salesforce AgentForce</strong>—where lifecycle campaigns and agent intelligence combine through AI.</p>
+
+<section>
+  <h2>🎯 Emarsys Campaign Trigger</h2>
+  <label for="customerSelect">Select Customer</label>
+  <select id="customerSelect">
+    <option value="">-- Choose --</option>
+    <option value="C001">Anna (C001)</option>
+    <option value="C002">Lucas (C002)</option>
+    <option value="C003">Sofia (C003)</option>
+  </select>
+
+  <label for="campaignSelect">Lifecycle Campaign</label>
+  <select id="campaignSelect">
+    <option value="WELCOME">WELCOME</option>
+    <option value="REACTIVATION">REACTIVATION</option>
+    <option value="BIRTHDAY">BIRTHDAY</option>
+  </select>
+
+  <label for="sourceSelect">Source System</label>
+  <select id="sourceSelect">
+    <option value="SAP Commerce Cloud">SAP Commerce Cloud</option>
+    <option value="Salesforce B2B">Salesforce B2B</option>
+    <option value="In-Store POS">In-Store POS</option>
+  </select>
+
+  <button onclick="triggerCampaign()">Trigger Campaign</button>
+  <pre id="triggerResponse" style="margin-top: 1rem;"></pre>
+</section>
+
+<section>
+  <h2>🧑‍💼 Agent Intelligence + AI Response</h2>
+  <div id="aiSuggestionBox"></div>
+  <div id="lifecycleBadgeBox"></div>
+
+  <label for="presetNotes">Choose an Agent Note</label>
+  <select id="presetNotes">
+    <option value="">-- Choose Example --</option>
+    <option value="Customer was angry about loyalty points.">Customer was angry about loyalty points.</option>
+    <option value="Customer thanked me for solving an issue.">Customer thanked me for solving an issue.</option>
+    <option value="Customer asked about campaign expiration.">Customer asked about campaign expiration.</option>
+  </select>
+
+  <label for="agentNote">Agent Note</label>
+  <textarea id="agentNote" rows="3"></textarea>
+  <button onclick="analyzeSentiment()">Analyze Sentiment with AI</button>
+  <div id="sentimentSummaryBox"></div>
+</section>
+
+<section>
+  <h2>📊 Real-Time Campaign Log</h2>
+  <button onclick="downloadAuditLog()">Download Audit Log</button>
+</section>
+
+<div id="helperPanel">
+  <strong>🔍 What’s this demo for?</strong>
+  <p>This prototype connects Emarsys (SAP) and AgentForce (Salesforce) to simulate how AI enhances agent workflows and lifecycle marketing, all in one seamless CX flow.</p>
+</div>
+
+<script>
+document.getElementById("presetNotes").addEventListener("change", (e) => {
+  document.getElementById("agentNote").value = e.target.value;
+});
+
+document.getElementById("customerSelect").addEventListener("change", async (e) => {
+  const contactID = e.target.value;
+  if (!contactID) return;
+
+  const aiRes = await fetch(`/api/ai/recommendation?contactID=${contactID}`);
+  const aiData = await aiRes.json();
+  document.getElementById("aiSuggestionBox").innerText =
+    `💡 AI Suggestion: ${aiData.action} (${Math.round(aiData.confidence * 100)}% confidence)`;
+
+  const lifecycleRes = await fetch(`/api/ai/lifecycle?contactID=${contactID}`);
+  const lifecycle = await lifecycleRes.json();
+  document.getElementById("lifecycleBadgeBox").innerText =
+    `📊 Predicted Lifecycle: ${lifecycle.stage} (${Math.round(lifecycle.confidence * 100)}% confidence)`;
+});
+
+async function analyzeSentiment() {
+  const note = document.getElementById("agentNote").value;
+  if (!note) return alert("Please enter a note.");
+
+  const res = await fetch("/api/ai/sentiment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: note })
+  });
+
+  const data = await res.json();
+  const box = document.getElementById("sentimentSummaryBox");
+  box.innerText = `🧠 AI Summary: ${data.summary} (Sentiment: ${data.sentiment})`;
+  box.className = "badge badge-" + data.sentiment;
+}
+
+async function triggerCampaign() {
+  const contactID = document.getElementById("customerSelect").value;
+  const eventCode = document.getElementById("campaignSelect").value;
+  const source = document.getElementById("sourceSelect").value;
+
+  const res = await fetch("/api/trigger", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contactID, eventCode, source })
+  });
+
+  const data = await res.json();
+  document.getElementById("triggerResponse").innerText = JSON.stringify(data, null, 2);
+}
+
+async function downloadAuditLog() {
+  const res = await fetch("/api/auditlog");
+  const data = await res.json();
+  const csv = data.value.map(log =>
+    `${log.timestamp},"${log.contactID}","${log.eventCode}","${log.source}","${log.message}"`
+  ).join("\n");
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'campaign_audit_log.csv';
+  link.click();
+}
+</script>
+
+</body>
+</html>
