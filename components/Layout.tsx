@@ -9,20 +9,13 @@ declare global {
   }
 }
 
-
 export default function Layout({ children, title = 'CX Demo Suite' }) {
-  // Add useEffect to ensure Clarity function exists
-  useEffect(() => {
-    window.clarity = window.clarity || function() { (window.clarity.q = window.clarity.q || []).push(arguments) };
-  }, []);
-
   return (
     <>
       <Head>
         <title>{title}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <meta httpEquiv="Content-Security-Policy" content="script-src 'self' https://www.clarity.ms;" />
       </Head>
 
       {/* Add Clarity Script here */}
@@ -44,4 +37,11 @@ export default function Layout({ children, title = 'CX Demo Suite' }) {
         <header style={{ padding: '1rem', backgroundColor: '#2f80ed', color: 'white', textAlign: 'center' }}>
           <h1 style={{ margin: 0 }}>CX Demo Suite</h1>
         </header>
-        <main style={{
+        <main style={{ padding: '2rem' }}>{children}</main>
+        <footer style={{ padding: '1rem', textAlign: 'center', fontSize: '0.8rem', color: '#777' }}>
+          Powered by SAP + Salesforce Simulation • {new Date().getFullYear()}
+        </footer>
+      </div>
+    </>
+  );
+}
