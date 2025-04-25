@@ -1,6 +1,14 @@
 import Head from 'next/head';
 import Script from 'next/script';
-import { useEffect } from 'react'; // <-- Add this import
+import { useEffect } from 'react';
+
+// ✅ Add this block
+declare global {
+  interface Window {
+    clarity: any;
+  }
+}
+
 
 export default function Layout({ children, title = 'CX Demo Suite' }) {
   // Add useEffect to ensure Clarity function exists
