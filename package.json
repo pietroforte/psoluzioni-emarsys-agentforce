@@ -10,11 +10,23 @@
     "react-dom": "^19.1.0",
     "sqlite3": "^5.1.6"
   },
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "vercel-build": "next build"
-}
-
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "vercel-build": "next build"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.0",
+    "@types/react": "19.1.2",
+    "typescript": "5.8.3"
+  },
+  "description": "Emarsys Loyalty Campaign Simulator with Vercel-compatible backend # psoluzioni-emarsys-agentforce",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
