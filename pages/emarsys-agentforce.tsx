@@ -105,7 +105,7 @@ export default function EmarsysAgentForce() {
           placeholder="Or type your own agent note here..."
           value={note}
           onChange={e => setNote(e.target.value)}
-          rows="4"
+          rows={4}
           style={{ width: '100%', marginTop: '0.5rem', padding: '0.5rem', fontSize: '1rem' }}
         />
 
