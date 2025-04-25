@@ -8,6 +8,7 @@ export default function EmarsysAgentForce() {
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [response, setResponse] = useState('');
   const [sentiment, setSentiment] = useState('');
+  const [wasCampaignSuggested, setWasCampaignSuggested] = useState(false);
 
   const fetchAI = async () => {
     if (!customerID) return;
@@ -25,6 +26,11 @@ export default function EmarsysAgentForce() {
     });
     const data = await res.json();
     setSentiment(`🧠 ${data.summary} (Sentiment: ${data.sentiment})`);
+
+    if (data.suggestedCampaign) {
+      setCampaign(data.suggestedCampaign);
+      setWasCampaignSuggested(true);
+    }
   };
 
   const triggerCampaign = async () => {
@@ -44,48 +50,12 @@ export default function EmarsysAgentForce() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           <img src="/emarsys-logo.png" alt="SAP Emarsys" style={{ height: '42px' }} />
-          <img src="/Salesforce-Agentforce.png" alt="Salesforce Agentforce" style={{ height: '44px' }} />
+          <img src="/salesforce-agentforce.png" alt="Salesforce Agentforce" style={{ height: '44px' }} />
         </div>
         <h1 style={{ fontSize: '1.5rem' }}>Unified CX Simulator</h1>
       </header>
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2>🎯 Emarsys Campaign Trigger</h2>
-        <label style={{ display: 'block', marginTop: '1rem' }}>Select Customer
-          <select value={customerID} onChange={e => setCustomerID(e.target.value)} style={{ width: '100%', marginTop: '0.25rem' }}>
-            <option value="">-- Choose --</option>
-            <option value="C001">Anna</option>
-            <option value="C002">Lucas</option>
-            <option value="C003">Sofia</option>
-          </select>
-        </label>
-
-        <label style={{ display: 'block', marginTop: '1rem' }}>Lifecycle Campaign
-          <select value={campaign} onChange={e => setCampaign(e.target.value)} style={{ width: '100%', marginTop: '0.25rem' }}>
-            <option value="WELCOME">WELCOME</option>
-            <option value="REACTIVATION">REACTIVATION</option>
-            <option value="BIRTHDAY">BIRTHDAY</option>
-          </select>
-        </label>
-
-        <label style={{ display: 'block', marginTop: '1rem' }}>Source System
-          <select value={source} onChange={e => setSource(e.target.value)} style={{ width: '100%', marginTop: '0.25rem' }}>
-            <option value="SAP Commerce Cloud">SAP Commerce Cloud</option>
-            <option value="Salesforce B2B">Salesforce B2B</option>
-            <option value="POS">POS</option>
-          </select>
-        </label>
-
-        <button onClick={triggerCampaign} style={{ marginTop: '1rem', backgroundColor: '#490093', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontWeight: 'bold' }}>
-          Trigger Campaign
-        </button>
-
-        <pre style={{ background: '#eef2ff', padding: '1rem', marginTop: '1rem', fontSize: '0.9rem' }}>{response}</pre>
-
-        {aiSuggestion && <p style={{ marginTop: '1rem' }}>💡 AI Suggestion: <strong>{aiSuggestion}</strong></p>}
-      </section>
-
-      <section style={{ marginTop: '3rem' }}>
+      <section style={{ marginBottom: '3rem' }}>
         <h2>🧑‍💼 AgentForce AI Interaction</h2>
 
         <label style={{ display: 'block', marginTop: '1rem' }}>
@@ -114,6 +84,60 @@ export default function EmarsysAgentForce() {
         </button>
 
         {sentiment && <p style={{ marginTop: '1rem', backgroundColor: '#e3f2fd', padding: '0.75rem' }}>{sentiment}</p>}
+      </section>
+
+      <section>
+        <h2>🎯 Emarsys Campaign Trigger</h2>
+        <label style={{ display: 'block', marginTop: '1rem' }}>Select Customer
+          <select value={customerID} onChange={e => setCustomerID(e.target.value)} style={{ width: '100%', marginTop: '0.25rem' }}>
+            <option value="">-- Choose --</option>
+            <option value="C001">Anna</option>
+            <option value="C002">Lucas</option>
+            <option value="C003">Sofia</option>
+          </select>
+        </label>
+
+        <label style={{ display: 'block', marginTop: '1rem' }}>Lifecycle Campaign
+          <select
+            value={campaign}
+            onChange={e => {
+              setCampaign(e.target.value);
+              setWasCampaignSuggested(false);
+            }}
+            style={{
+              width: '100%',
+              marginTop: '0.25rem',
+              border: wasCampaignSuggested ? '2px solid #00b894' : undefined,
+              backgroundColor: wasCampaignSuggested ? '#e6fff4' : undefined
+            }}
+          >
+            <option value="WELCOME">WELCOME</option>
+            <option value="REACTIVATION">REACTIVATION</option>
+            <option value="BIRTHDAY">BIRTHDAY</option>
+          </select>
+        </label>
+
+        {wasCampaignSuggested && (
+          <p style={{ color: '#009688', marginTop: '0.5rem' }}>
+            📡 Campaign suggestion powered by AI Sentiment Analysis
+          </p>
+        )}
+
+        <label style={{ display: 'block', marginTop: '1rem' }}>Source System
+          <select value={source} onChange={e => setSource(e.target.value)} style={{ width: '100%', marginTop: '0.25rem' }}>
+            <option value="SAP Commerce Cloud">SAP Commerce Cloud</option>
+            <option value="Salesforce B2B">Salesforce B2B</option>
+            <option value="POS">POS</option>
+          </select>
+        </label>
+
+        <button onClick={triggerCampaign} style={{ marginTop: '1rem', backgroundColor: '#490093', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontWeight: 'bold' }}>
+          Trigger Campaign
+        </button>
+
+        <pre style={{ background: '#eef2ff', padding: '1rem', marginTop: '1rem', fontSize: '0.9rem' }}>{response}</pre>
+
+        {aiSuggestion && <p style={{ marginTop: '1rem' }}>💡 AI Suggestion: <strong>{aiSuggestion}</strong></p>}
       </section>
     </main>
   );
