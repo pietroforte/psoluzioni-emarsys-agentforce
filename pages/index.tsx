@@ -24,6 +24,11 @@ export default function Home() {
               🔀 Unified Emarsys + AgentForce
             </a>
           </Link>
+          <Link href="/hubspot-agentic" legacyBehavior>
+            <a style={{ ...linkStyle, backgroundColor: '#6a1b9a' }}>
+              🤖 HubSpot Smart Deals (Agentic AI)
+            </a>
+          </Link>
         </div>
       </div>
     </Layout>
